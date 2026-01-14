@@ -1,6 +1,6 @@
 # PassAudit
 
-> A comprehensive password security analyzer that provides detailed vulnerability assessments and actionable recommendations.
+> A comprehensive password security analyser that provides detailed vulnerability assessments and actionable recommendations.
 
 PassAudit delivers transparent password analysis with specific explanations for security weaknesses. Rather than providing generic strength ratings, it identifies exact vulnerabilities including common patterns, breach exposure, and structural weaknesses with detailed remediation guidance.
 
@@ -33,7 +33,7 @@ pip install -r requirements.txt
 ## Quick Start
 
 ```bash
-# Analyze a single password
+# Analyse a single password
 python Main.py -p "MyPassword123"
 
 # Generate a secure password
@@ -54,7 +54,7 @@ python Main.py -p "YourPassword"
 
 **Batch Analysis**
 ```bash
-# Analyze passwords from a file (one per line)
+# Analyse passwords from a file (one per line)
 python Main.py -f passwords.txt
 ```
 
@@ -83,8 +83,8 @@ python Main.py -f passwords.txt --export-csv results.csv
 ### Command Line Options
 
 ```
--p, --password      Analyze a single password
--f, --file          Analyze passwords from a file
+-p, --password      Analyse a single password
+-f, --file          Analyse passwords from a file
 -g, --generate      Generate secure passwords
 -c, --count         Number of passwords to generate (default: 1)
 -l, --length        Password length (default: 16)
@@ -93,7 +93,7 @@ python Main.py -f passwords.txt --export-csv results.csv
 --export-csv        Export results to CSV file
 --export-html       Export results to HTML file
 --config-show       Show current configuration
---config-init       Initialize default configuration file
+--config-init       Initialise default configuration file
 --config-reset      Reset configuration to defaults
 --config-set        Set configuration value
 ```
@@ -186,7 +186,7 @@ PassAudit stores user preferences in `~/.passaudit/config.json`, allowing you to
 ### Configuration Commands
 
 ```bash
-# Initialize configuration file with defaults
+# Initialise configuration file with defaults
 python Main.py --config-init
 
 # Set default password length to 20 characters
@@ -199,8 +199,8 @@ python Main.py --config-show
 ### Configuration Options
 
 - **Generator settings**: Default length, count, character type preferences
-- **Output settings**: JSON mode, color output preferences
-- **Security settings**: Default HIBP checking behavior
+- **Output settings**: JSON mode, colour output preferences
+- **Security settings**: Default HIBP checking behaviour
 
 ## Expanding the Password Database
 
@@ -269,7 +269,7 @@ This tool is designed for security professionals conducting password audits, sys
 
 ## Use Cases
 
-- **Security audits** - Batch analysis of organizational passwords with detailed reporting
+- **Security audits** - Batch analysis of organisational passwords with detailed reporting
 - **Password policy enforcement** - Integration into user account systems for validation
 - **Security training** - Demonstrating password vulnerabilities with specific examples
 - **Incident response** - Checking whether credentials may be compromised
@@ -298,7 +298,7 @@ Under GPL-3.0, you are free to use, modify, and distribute this software. If you
 - **Author**: [@botchx86](https://github.com/botchx86)
 - **Have I Been Pwned API**: [haveibeenpwned.com](https://haveibeenpwned.com/) by Troy Hunt
 - **Common password lists**: [SecLists](https://github.com/danielmiessler/SecLists) by Daniel Miessler
-- **Terminal colors**: [colorama](https://github.com/tartley/colorama)
+- **Terminal colours**: [colorama](https://github.com/tartley/colorama)
 
 ## Frequently Asked Questions
 
@@ -320,7 +320,7 @@ Yes. PassAudit supports JSON output mode (`-j` flag) and can be integrated into 
 
 **What is the performance impact for large datasets?**
 
-PassAudit is optimized for batch processing. The common password database uses hash-based lookups for O(1) performance. HIBP checks require network requests and should be used judiciously for large datasets.
+PassAudit is optimised for batch processing. The common password database uses hash-based lookups for O(1) performance. HIBP checks require network requests and should be used judiciously for large datasets.
 
 ---
 
