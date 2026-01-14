@@ -1,0 +1,21 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(dir:*)",
+      "Bash(git -C /d/Dev/PasswordRiskAnalyser log --oneline -10)",
+      "Bash(git -C /d/Dev/PasswordRiskAnalyser show --stat)",
+      "Bash(git -C /d/Dev/PasswordRiskAnalyser log --all --oneline)",
+      "Bash(git -C /d/Dev/PasswordRiskAnalyser diff HEAD~1..HEAD)",
+      "Bash(git -C /d/Dev/PasswordRiskAnalyser show HEAD --format=\"\")",
+      "Bash(git -C /d/Dev/PasswordRiskAnalyser status -s)",
+      "Bash(git -C /d/Dev/PasswordRiskAnalyser ls-files:*)",
+      "Bash(git -C /d/Dev/PasswordRiskAnalyser remote:*)",
+      "Bash(python3:*)",
+      "WebFetch(domain:raw.githubusercontent.com)",
+      "Bash(python Main.py:*)",
+      "Bash(pip install:*)",
+      "Bash(python -m pytest:*)",
+      "Bash(ls:*)"
+    ]
+  }
+}

@@ -1,0 +1,7 @@
+# Password Risk Analyser - Dependencies
+
+# Optional: Colored terminal output (works without it, but colors improve UX)
+colorama>=0.4.6
+
+# Development dependencies (for running tests)
+pytest>=7.0.0
