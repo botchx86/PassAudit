@@ -5,7 +5,7 @@
 PassAudit delivers transparent password analysis with specific explanations for security weaknesses. Rather than providing generic strength ratings, it identifies exact vulnerabilities including common patterns, breach exposure, and structural weaknesses with detailed remediation guidance.
 
 [![License: GPL v3](https://img.shields.io/badge/License-GPLv3-blue.svg)](https://www.gnu.org/licenses/gpl-3.0)
-[![Python 3.6+](https://img.shields.io/badge/python-3.6+-blue.svg)](https://www.python.org/downloads/)
+[![Python 3.9+](https://img.shields.io/badge/python-3.9+-blue.svg)]
 [![Tests](https://img.shields.io/badge/tests-40%20passed-brightgreen.svg)](tests/)
 
 ## Features
