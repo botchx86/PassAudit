@@ -1,0 +1,95 @@
+{% extends "base.html" %}
+
+{% block title %}PassAudit - Settings{% endblock %}
+
+{% block content %}
+<div class="container">
+    <h2 class="mb-4">
+        <i class="bi bi-gear"></i> Settings
+    </h2>
+
+    <div class="row">
+        <div class="col-lg-8">
+            <div class="card mb-4">
+                <div class="card-body">
+                    <h5 class="card-title">Current Configuration</h5>
+                    <pre class="bg-light p-3 rounded"><code>{{ config | tojson(indent=2) }}</code></pre>
+                </div>
+            </div>
+
+            <div class="card">
+                <div class="card-body">
+                    <h5 class="card-title">HIBP Cache</h5>
+                    <p class="card-text">
+                        Manage the Have I Been Pwned cache to improve performance.
+                    </p>
+
+                    <button type="button" class="btn btn-info me-2" id="cache-stats-btn">
+                        <i class="bi bi-info-circle"></i> View Stats
+                    </button>
+
+                    <button type="button" class="btn btn-warning" id="cache-clear-btn">
+                        <i class="bi bi-trash"></i> Clear Cache
+                    </button>
+
+                    <div id="cache-info" class="mt-3" style="display: none;"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_scripts %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const statsBtn = document.getElementById('cache-stats-btn');
+    const clearBtn = document.getElementById('cache-clear-btn');
+    const cacheInfo = document.getElementById('cache-info');
+
+    statsBtn.addEventListener('click', function() {
+        fetch('/config/cache/stats')
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    cacheInfo.innerHTML = `
+                        <div class="alert alert-info">
+                            <h6>Cache Statistics:</h6>
+                            <ul class="mb-0">
+                                <li>Total Entries: ${data.stats.total_entries.toLocaleString()}</li>
+                                <li>Expired Entries: ${data.stats.expired_entries.toLocaleString()}</li>
+                            </ul>
+                        </div>
+                    `;
+                    cacheInfo.style.display = 'block';
+                } else {
+                    alert('Error: ' + data.error);
+                }
+            })
+            .catch(error => {
+                alert('Error fetching cache stats: ' + error);
+            });
+    });
+
+    clearBtn.addEventListener('click', function() {
+        if (!confirm('Are you sure you want to clear the HIBP cache?')) {
+            return;
+        }
+
+        fetch('/config/cache/clear', { method: 'POST' })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    alert('Cache cleared successfully!');
+                    cacheInfo.style.display = 'none';
+                } else {
+                    alert('Error: ' + data.error);
+                }
+            })
+            .catch(error => {
+                alert('Error clearing cache: ' + error);
+            });
+    });
+});
+</script>
+{% endblock %}

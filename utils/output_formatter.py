@@ -88,6 +88,18 @@ def DisplaySingleResult(result):
             print(f"  {i}. {feedback_item}")
         print()
 
+    # Policy validation results
+    if 'policy_valid' in result:
+        print(f"Policy Validation ({result['policy_name']}):")
+        if result['policy_valid']:
+            print(f"  {Fore.GREEN}[PASS] Password meets all policy requirements{Style.RESET_ALL}")
+        else:
+            print(f"  {Fore.RED}[FAIL] Password does not meet policy requirements{Style.RESET_ALL}")
+            print(f"\n  Policy Violations:")
+            for i, error in enumerate(result['policy_errors'], 1):
+                print(f"    {i}. {error}")
+        print()
+
     print("=" * 60)
 
 def DisplayBatchResults(results):

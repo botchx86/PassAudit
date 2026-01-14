@@ -6,6 +6,7 @@ Script to download and prepare the SecLists 10k-most-common passwords database
 import urllib.request
 import os
 import sys
+import argparse
 
 # URLs for common password lists
 SECLISTS_10K_URL = "https://raw.githubusercontent.com/danielmiessler/SecLists/master/Passwords/Common-Credentials/10k-most-common.txt"
@@ -29,15 +30,20 @@ def download_password_list(url, output_path):
         # Count passwords
         password_count = len([line for line in content.splitlines() if line.strip() and not line.startswith('#')])
 
-        print(f"✓ Successfully downloaded {password_count:,} passwords to {output_path}")
+        print(f"[OK] Successfully downloaded {password_count:,} passwords to {output_path}")
         return True
 
     except Exception as e:
-        print(f"✗ Error downloading password list: {e}")
+        print(f"[ERROR] Error downloading password list: {e}")
         return False
 
 def main():
     """Main function"""
+    # Parse arguments
+    parser = argparse.ArgumentParser(description="Download 10k most common passwords")
+    parser.add_argument("--force", "-f", action="store_true", help="Force overwrite without asking")
+    args = parser.parse_args()
+
     # Determine paths
     script_dir = os.path.dirname(os.path.abspath(__file__))
     project_root = os.path.dirname(script_dir)
@@ -48,7 +54,7 @@ def main():
     os.makedirs(data_dir, exist_ok=True)
 
     # Check if file already exists
-    if os.path.exists(output_file):
+    if os.path.exists(output_file) and not args.force:
         response = input(f"File {output_file} already exists. Overwrite? (y/N): ")
         if response.lower() != 'y':
             print("Aborted.")

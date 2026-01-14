@@ -3,5 +3,16 @@
 # Optional: Colored terminal output (works without it, but colors improve UX)
 colorama>=0.4.6
 
+# PDF Report Generation
+reportlab>=4.0.0
+pillow>=10.0.0
+
+# Web Interface
+flask>=3.0.0
+werkzeug>=3.0.0
+
+# HTTP requests (for HIBP, health checks)
+requests>=2.31.0
+
 # Development dependencies (for running tests)
 pytest>=7.0.0

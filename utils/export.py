@@ -3,6 +3,19 @@ import json
 from datetime import datetime
 from pathlib import Path
 
+def get_entropy_category(entropy):
+    """Categorize entropy level"""
+    if entropy < 28:
+        return 'Very Low'
+    elif entropy < 36:
+        return 'Low'
+    elif entropy < 60:
+        return 'Medium'
+    elif entropy < 128:
+        return 'High'
+    else:
+        return 'Very High'
+
 def ExportToCSV(results, output_path):
     """Export analysis results to CSV file"""
     try:
@@ -15,13 +28,17 @@ def ExportToCSV(results, output_path):
                 'Strength Category',
                 'Shannon Entropy',
                 'Pool Entropy',
+                'Entropy Category',
                 'Is Common',
                 'Sequences',
                 'Keyboard Walks',
                 'Repeated Chars',
                 'Dates',
                 'Common Words',
-                'Feedback Count'
+                'Leetspeak',
+                'Context Patterns',
+                'Feedback Count',
+                'Timestamp'
             ]
 
             # Add HIBP fields if present
@@ -40,13 +57,17 @@ def ExportToCSV(results, output_path):
                     'Strength Category': result['strength_category'],
                     'Shannon Entropy': result['entropy'],
                     'Pool Entropy': result['pool_entropy'],
+                    'Entropy Category': get_entropy_category(result['entropy']),
                     'Is Common': 'YES' if result['is_common'] else 'NO',
                     'Sequences': ', '.join(result['patterns'].get('sequences', [])) if result['patterns'].get('sequences') else '',
                     'Keyboard Walks': ', '.join(result['patterns'].get('keyboard_walks', [])) if result['patterns'].get('keyboard_walks') else '',
                     'Repeated Chars': ', '.join(result['patterns'].get('repeated_chars', [])) if result['patterns'].get('repeated_chars') else '',
                     'Dates': ', '.join(result['patterns'].get('dates', [])) if result['patterns'].get('dates') else '',
                     'Common Words': ', '.join(result['patterns'].get('common_words', [])) if result['patterns'].get('common_words') else '',
-                    'Feedback Count': len(result['feedback'])
+                    'Leetspeak': ', '.join(result['patterns'].get('leetspeak', [])) if result['patterns'].get('leetspeak') else '',
+                    'Context Patterns': ', '.join(result['patterns'].get('context_patterns', [])) if result['patterns'].get('context_patterns') else '',
+                    'Feedback Count': len(result['feedback']),
+                    'Timestamp': datetime.now().strftime('%Y-%m-%d %H:%M:%S')
                 }
 
                 # Add HIBP data if present

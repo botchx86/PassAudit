@@ -1,4 +1,5 @@
 import argparse
+from concurrent.futures import ThreadPoolExecutor, as_completed
 from analyzer.strength import CalculateStrength, GetStrengthCategory
 from analyzer.entropy import CalculateEntropy, CalculateCharacterPoolEntropy
 from analyzer.patterns import DetectPatterns
@@ -6,8 +7,10 @@ from analyzer.common_passwords import IsCommonPassword
 from analyzer.feedback import GenerateFeedback
 from analyzer.generator import GeneratePasswords
 from analyzer.hibp import CheckHIBP
+from analyzer.policy import get_policy, PasswordPolicy
 from utils.output_formatter import DisplayResults
 from utils.export import ExportToCSV, ExportToHTML
+from utils.export_pdf import ExportToPDF
 from utils.config import LoadConfig, SaveConfig, ShowConfig, UpdateConfigValue, ResetConfig, InitializeConfig
 
 def Parser():
@@ -30,6 +33,12 @@ def Parser():
         "-g", "--generate",
         action="store_true",
         help="Generate secure random passwords"
+        )
+
+    group.add_argument(
+        "-i", "--interactive",
+        action="store_true",
+        help="Start interactive CLI mode"
         )
 
     # Generator options
@@ -85,6 +94,22 @@ def Parser():
         help="Check passwords against Have I Been Pwned breach database (requires internet)"
         )
 
+    # Policy validation options
+    parser.add_argument(
+        "--policy",
+        type=str,
+        metavar="PRESET",
+        choices=['POLICY_BASIC', 'POLICY_MEDIUM', 'POLICY_STRONG', 'POLICY_ENTERPRISE'],
+        help="Validate passwords against a policy preset (POLICY_BASIC, POLICY_MEDIUM, POLICY_STRONG, POLICY_ENTERPRISE)"
+        )
+
+    parser.add_argument(
+        "--policy-file",
+        type=str,
+        metavar="FILE",
+        help="Path to custom policy JSON file"
+        )
+
     # Export options
     parser.add_argument(
         "--export-csv",
@@ -98,6 +123,13 @@ def Parser():
         type=str,
         metavar="FILE",
         help="Export results to HTML file"
+        )
+
+    parser.add_argument(
+        "--export-pdf",
+        type=str,
+        metavar="FILE",
+        help="Export results to PDF file"
         )
 
     # Config options
@@ -158,7 +190,7 @@ def GetPassword(args):
 
     raise ValueError("No valid input provided")
 
-def AnalyzePassword(password, check_hibp=False):
+def AnalyzePassword(password, check_hibp=False, hibp_timeout=5, policy=None):
     """
     Perform comprehensive analysis on a single password
     Returns analysis results as a dictionary
@@ -171,7 +203,7 @@ def AnalyzePassword(password, check_hibp=False):
     hibp_pwned = False
     hibp_count = 0
     if check_hibp:
-        hibp_pwned, hibp_count = CheckHIBP(password)
+        hibp_pwned, hibp_count = CheckHIBP(password, timeout=hibp_timeout)
         # If hibp_pwned is None, the check failed (no internet, etc.)
         if hibp_pwned is None:
             hibp_pwned = False
@@ -200,16 +232,60 @@ def AnalyzePassword(password, check_hibp=False):
         result['hibp_pwned'] = hibp_pwned
         result['hibp_count'] = hibp_count
 
+    # Validate against policy if provided
+    if policy:
+        is_valid, errors = policy.validate(password, result)
+        result['policy_valid'] = is_valid
+        result['policy_errors'] = errors
+        result['policy_name'] = policy.name
+
     return result
 
-def AnalyzePasswords(passwords, check_hibp=False):
+def AnalyzePasswords(passwords, check_hibp=False, hibp_timeout=5, max_workers=4, policy=None):
     """
     Analyze multiple passwords and return results
+    Uses parallel processing for improved performance on large batches
+
+    Args:
+        passwords: List of passwords to analyze
+        check_hibp: Whether to check HIBP database
+        hibp_timeout: Timeout for HIBP requests
+        max_workers: Maximum number of parallel workers (default: 4)
+        policy: Optional PasswordPolicy for validation
     """
-    results = []
-    for password in passwords:
-        result = AnalyzePassword(password, check_hibp=check_hibp)
-        results.append(result)
+    # For small batches or single passwords, use sequential processing
+    if len(passwords) <= 5:
+        results = []
+        for password in passwords:
+            result = AnalyzePassword(password, check_hibp=check_hibp, hibp_timeout=hibp_timeout, policy=policy)
+            results.append(result)
+        return results
+
+    # For larger batches, use parallel processing
+    results = [None] * len(passwords)  # Pre-allocate to maintain order
+
+    with ThreadPoolExecutor(max_workers=max_workers) as executor:
+        # Submit all tasks
+        future_to_index = {
+            executor.submit(AnalyzePassword, password, check_hibp, hibp_timeout, policy): idx
+            for idx, password in enumerate(passwords)
+        }
+
+        # Collect results as they complete
+        for future in as_completed(future_to_index):
+            idx = future_to_index[future]
+            try:
+                results[idx] = future.result()
+            except Exception as e:
+                # Log error but continue with other passwords
+                print(f"Error analyzing password {idx + 1}: {e}")
+                # Create error result
+                results[idx] = {
+                    'password': passwords[idx],
+                    'error': str(e),
+                    'strength_score': 0,
+                    'strength_category': 'Error'
+                }
 
     return results
 
@@ -232,6 +308,13 @@ def Main():
     if args.config_set:
         section, key, value = args.config_set
         UpdateConfigValue(section, key, value)
+        return
+
+    # Handle interactive mode
+    if args.interactive:
+        from cli.interactive import InteractiveCLI
+        cli = InteractiveCLI()
+        cli.run()
         return
 
     # Check that one of the main options is provided
@@ -258,9 +341,25 @@ def Main():
         else:
             print(f"Loaded {len(passwords)} password(s) for analysis\n")
 
+    # Load password policy if specified
+    policy = None
+    if args.policy:
+        policy = get_policy(args.policy)
+        if policy and not args.json:
+            print(f"Using policy: {policy.name}")
+            print(f"Policy requirements:")
+            for req in policy.get_requirements():
+                print(f"  - {req}")
+            print()
+    elif args.policy_file:
+        # TODO: Implement custom policy file loading
+        print("Custom policy files not yet implemented")
+
     # Perform analysis
     check_hibp = args.check_hibp or config['security'].get('check_hibp', False)
-    results = AnalyzePasswords(passwords, check_hibp=check_hibp)
+    hibp_timeout = config['security'].get('hibp_timeout', 5)
+    max_workers = config.get('performance', {}).get('batch_processing_threads', 4)
+    results = AnalyzePasswords(passwords, check_hibp=check_hibp, hibp_timeout=hibp_timeout, max_workers=max_workers, policy=policy)
 
     # Format and display results
     DisplayResults(results, json_output=args.json)
@@ -271,6 +370,9 @@ def Main():
 
     if args.export_html:
         ExportToHTML(results, args.export_html)
+
+    if args.export_pdf:
+        ExportToPDF(results, args.export_pdf)
     
 if __name__ == "__main__":
     Main()

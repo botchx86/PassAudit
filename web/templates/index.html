@@ -1,0 +1,284 @@
+{% extends "base.html" %}
+
+{% block title %}PassAudit - Home{% endblock %}
+
+{% block content %}
+<div class="container">
+    <!-- Hero Section -->
+    <div class="row mb-5">
+        <div class="col-lg-12 text-center">
+            <h1 class="display-4 mb-3">
+                <i class="bi bi-shield-lock-fill text-primary"></i>
+                Password Security Analyzer
+            </h1>
+            <p class="lead text-muted">
+                Analyze password strength, detect patterns, and generate secure passwords
+            </p>
+        </div>
+    </div>
+
+    <!-- Quick Check Section -->
+    <div class="row justify-content-center">
+        <div class="col-lg-8">
+            <div class="card shadow-sm">
+                <div class="card-body p-4">
+                    <h3 class="card-title mb-4">
+                        <i class="bi bi-search"></i> Quick Password Check
+                    </h3>
+
+                    <div class="mb-3">
+                        <label for="quick-password" class="form-label">Enter a password to analyze:</label>
+                        <input type="password" class="form-control form-control-lg" id="quick-password"
+                               placeholder="Type password here..." autocomplete="off">
+                        <div class="form-text">
+                            <i class="bi bi-info-circle"></i>
+                            Your password is analyzed locally and not sent to any server.
+                        </div>
+                    </div>
+
+                    <div class="form-check mb-3">
+                        <input class="form-check-input" type="checkbox" id="show-password">
+                        <label class="form-check-label" for="show-password">
+                            Show password
+                        </label>
+                    </div>
+
+                    <div id="quick-result" class="mt-4" style="display: none;">
+                        <!-- Strength Meter -->
+                        <div class="mb-3">
+                            <label class="form-label fw-bold">Strength Score:</label>
+                            <div class="progress" style="height: 30px;">
+                                <div id="strength-bar" class="progress-bar" role="progressbar"
+                                     style="width: 0%;" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100">
+                                    <span id="strength-text">0/100</span>
+                                </div>
+                            </div>
+                            <div id="strength-category" class="mt-2 text-center"></div>
+                        </div>
+
+                        <!-- Details -->
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <div class="card">
+                                    <div class="card-body">
+                                        <h6 class="card-subtitle mb-2 text-muted">
+                                            <i class="bi bi-rulers"></i> Length
+                                        </h6>
+                                        <p class="card-text fs-4" id="password-length">-</p>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <div class="card">
+                                    <div class="card-body">
+                                        <h6 class="card-subtitle mb-2 text-muted">
+                                            <i class="bi bi-graph-up"></i> Entropy
+                                        </h6>
+                                        <p class="card-text fs-4" id="password-entropy">-</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Common Password Warning -->
+                        <div id="common-warning" class="alert alert-warning" style="display: none;">
+                            <i class="bi bi-exclamation-triangle-fill"></i>
+                            <strong>Warning:</strong> This is a commonly used password!
+                        </div>
+
+                        <!-- Detected Patterns -->
+                        <div id="patterns-section" style="display: none;">
+                            <h6 class="mb-2">
+                                <i class="bi bi-bug-fill text-warning"></i> Detected Patterns:
+                            </h6>
+                            <div id="patterns-list" class="mb-3"></div>
+                        </div>
+
+                        <!-- Feedback -->
+                        <div id="feedback-section" style="display: none;">
+                            <h6 class="mb-2">
+                                <i class="bi bi-lightbulb-fill text-info"></i> Recommendations:
+                            </h6>
+                            <ul id="feedback-list" class="list-unstyled"></ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Features Section -->
+    <div class="row mt-5">
+        <div class="col-lg-4 mb-4">
+            <div class="card h-100">
+                <div class="card-body text-center">
+                    <i class="bi bi-file-earmark-text display-4 text-primary mb-3"></i>
+                    <h5 class="card-title">Batch Analysis</h5>
+                    <p class="card-text">
+                        Analyze multiple passwords from a file at once with detailed reports.
+                    </p>
+                    <a href="/analyze" class="btn btn-outline-primary">
+                        Go to Analysis <i class="bi bi-arrow-right"></i>
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-lg-4 mb-4">
+            <div class="card h-100">
+                <div class="card-body text-center">
+                    <i class="bi bi-key-fill display-4 text-success mb-3"></i>
+                    <h5 class="card-title">Password Generator</h5>
+                    <p class="card-text">
+                        Generate cryptographically secure random passwords with custom options.
+                    </p>
+                    <a href="/analyze#generate" class="btn btn-outline-success">
+                        Generate Passwords <i class="bi bi-arrow-right"></i>
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-lg-4 mb-4">
+            <div class="card h-100">
+                <div class="card-body text-center">
+                    <i class="bi bi-shield-check display-4 text-info mb-3"></i>
+                    <h5 class="card-title">HIBP Integration</h5>
+                    <p class="card-text">
+                        Check if passwords have been exposed in known data breaches.
+                    </p>
+                    <a href="/analyze" class="btn btn-outline-info">
+                        Check Breaches <i class="bi bi-arrow-right"></i>
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_scripts %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const passwordInput = document.getElementById('quick-password');
+    const showPasswordCheckbox = document.getElementById('show-password');
+    const resultDiv = document.getElementById('quick-result');
+    let debounceTimer;
+
+    // Toggle password visibility
+    showPasswordCheckbox.addEventListener('change', function() {
+        passwordInput.type = this.checked ? 'text' : 'password';
+    });
+
+    // Analyze password on input
+    passwordInput.addEventListener('input', function() {
+        clearTimeout(debounceTimer);
+        const password = this.value;
+
+        if (!password) {
+            resultDiv.style.display = 'none';
+            return;
+        }
+
+        debounceTimer = setTimeout(() => {
+            analyzePassword(password);
+        }, 300);
+    });
+
+    function analyzePassword(password) {
+        fetch('/quick-check', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({ password: password })
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.error) {
+                console.error(data.error);
+                return;
+            }
+
+            displayResults(data);
+        })
+        .catch(error => {
+            console.error('Error:', error);
+        });
+    }
+
+    function displayResults(data) {
+        resultDiv.style.display = 'block';
+
+        // Update strength meter
+        const score = data.strength_score;
+        const strengthBar = document.getElementById('strength-bar');
+        const strengthText = document.getElementById('strength-text');
+        const strengthCategory = document.getElementById('strength-category');
+
+        strengthBar.style.width = score + '%';
+        strengthBar.setAttribute('aria-valuenow', score);
+        strengthText.textContent = score + '/100';
+
+        // Color code based on strength
+        strengthBar.className = 'progress-bar';
+        if (score >= 80) {
+            strengthBar.classList.add('bg-success');
+            strengthCategory.innerHTML = '<span class="badge bg-success">Very Strong</span>';
+        } else if (score >= 60) {
+            strengthBar.classList.add('bg-info');
+            strengthCategory.innerHTML = '<span class="badge bg-info">Strong</span>';
+        } else if (score >= 40) {
+            strengthBar.classList.add('bg-warning');
+            strengthCategory.innerHTML = '<span class="badge bg-warning">Medium</span>';
+        } else if (score >= 20) {
+            strengthBar.classList.add('bg-orange');
+            strengthCategory.innerHTML = '<span class="badge bg-warning">Weak</span>';
+        } else {
+            strengthBar.classList.add('bg-danger');
+            strengthCategory.innerHTML = '<span class="badge bg-danger">Very Weak</span>';
+        }
+
+        // Update details
+        document.getElementById('password-length').textContent = data.length + ' characters';
+        document.getElementById('password-entropy').textContent = data.entropy + ' bits';
+
+        // Common password warning
+        const commonWarning = document.getElementById('common-warning');
+        commonWarning.style.display = data.is_common ? 'block' : 'none';
+
+        // Patterns
+        const patternsSection = document.getElementById('patterns-section');
+        const patternsList = document.getElementById('patterns-list');
+        if (Object.keys(data.patterns).length > 0) {
+            patternsSection.style.display = 'block';
+            patternsList.innerHTML = '';
+            for (const [type, items] of Object.entries(data.patterns)) {
+                const badge = document.createElement('span');
+                badge.className = 'badge bg-warning me-2 mb-2';
+                badge.textContent = type.replace(/_/g, ' ');
+                patternsList.appendChild(badge);
+            }
+        } else {
+            patternsSection.style.display = 'none';
+        }
+
+        // Feedback
+        const feedbackSection = document.getElementById('feedback-section');
+        const feedbackList = document.getElementById('feedback-list');
+        if (data.feedback && data.feedback.length > 0) {
+            feedbackSection.style.display = 'block';
+            feedbackList.innerHTML = '';
+            data.feedback.forEach(item => {
+                const li = document.createElement('li');
+                li.className = 'mb-2';
+                li.innerHTML = '<i class="bi bi-check-circle text-info"></i> ' + item;
+                feedbackList.appendChild(li);
+            });
+        } else {
+            feedbackSection.style.display = 'none';
+        }
+    }
+});
+</script>
+{% endblock %}

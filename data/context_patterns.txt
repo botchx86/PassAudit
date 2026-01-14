@@ -1,0 +1,106 @@
+# Context-specific patterns
+# These are words commonly used in passwords that relate to specific contexts
+# Companies, technology, sports, pop culture, etc.
+
+# Major tech companies
+microsoft
+google
+facebook
+apple
+amazon
+netflix
+twitter
+instagram
+linkedin
+snapchat
+tiktok
+yahoo
+ibm
+oracle
+adobe
+salesforce
+
+# Technology terms
+linux
+windows
+android
+iphone
+ipad
+macbook
+chrome
+firefox
+safari
+macos
+ubuntu
+debian
+fedora
+python
+java
+javascript
+docker
+kubernetes
+
+# Sports teams (US)
+yankees
+lakers
+cowboys
+patriots
+redsox
+cubs
+dodgers
+celtics
+warriors
+heat
+knicks
+rangers
+giants
+eagles
+raiders
+steelers
+
+# Popular culture
+starwars
+pokemon
+marvel
+superman
+batman
+spiderman
+ironman
+avengers
+disney
+pixar
+netflix
+minecraft
+fortnite
+warcraft
+zelda
+mario
+sonic
+pikachu
+
+# Common brands
+nike
+adidas
+puma
+reebok
+underarmour
+cocacola
+pepsi
+starbucks
+mcdonalds
+subway
+walmart
+target
+costco
+ikea
+toyota
+honda
+ford
+tesla
+
+# Gaming platforms
+playstation
+xbox
+nintendo
+steam
+twitch

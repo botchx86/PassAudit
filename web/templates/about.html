@@ -1,0 +1,65 @@
+{% extends "base.html" %}
+
+{% block title %}PassAudit - About{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="row justify-content-center">
+        <div class="col-lg-8">
+            <h2 class="mb-4">
+                <i class="bi bi-info-circle"></i> About PassAudit
+            </h2>
+
+            <div class="card mb-4">
+                <div class="card-body">
+                    <h5 class="card-title">What is PassAudit?</h5>
+                    <p class="card-text">
+                        PassAudit is a comprehensive password security analysis tool that helps individuals
+                        and organizations evaluate password strength, detect vulnerabilities, and generate
+                        secure passwords.
+                    </p>
+                </div>
+            </div>
+
+            <div class="card mb-4">
+                <div class="card-body">
+                    <h5 class="card-title">Features</h5>
+                    <ul>
+                        <li>Advanced pattern detection (sequences, keyboard walks, leetspeak, etc.)</li>
+                        <li>Entropy calculation and strength scoring</li>
+                        <li>Common password database (10,000+ entries)</li>
+                        <li>Have I Been Pwned integration</li>
+                        <li>Batch analysis with detailed reports</li>
+                        <li>Secure password generation</li>
+                        <li>Export to CSV, HTML, and PDF</li>
+                        <li>RESTful API for programmatic access</li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="card mb-4">
+                <div class="card-body">
+                    <h5 class="card-title">Open Source</h5>
+                    <p class="card-text">
+                        PassAudit is open source software. Contributions are welcome!
+                    </p>
+                    <a href="https://github.com/botchx86/PassAudit" class="btn btn-outline-primary" target="_blank">
+                        <i class="bi bi-github"></i> View on GitHub
+                    </a>
+                </div>
+            </div>
+
+            <div class="card">
+                <div class="card-body">
+                    <h5 class="card-title">Version Information</h5>
+                    <p class="card-text">
+                        <strong>Version:</strong> 2.0.0<br>
+                        <strong>Python:</strong> 3.9+<br>
+                        <strong>License:</strong> MIT
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

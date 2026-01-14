@@ -149,5 +149,8 @@ $RECYCLE.BIN/
 tmp/
 temp/
 *.tmp
-tmpclaude-*.cwd
+tmpclaude-*
 nul
+
+# Claude Code
+.claude/

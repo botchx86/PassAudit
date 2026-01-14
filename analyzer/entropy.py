@@ -1,7 +1,8 @@
 import math
 from collections import Counter
+from typing import Optional
 
-def CalculateEntropy(password):
+def CalculateEntropy(password: str) -> float:
     """
     Calculate Shannon entropy: H = -Σ(p(x) * log2(p(x)))
     Returns bits of entropy
@@ -24,7 +25,7 @@ def CalculateEntropy(password):
 
     return round(total_entropy, 2)
 
-def CalculateCharacterPoolEntropy(password):
+def CalculateCharacterPoolEntropy(password: str) -> float:
     """
     Calculate entropy based on character pool size
     Formula: log2(pool_size^length) = length * log2(pool_size)
@@ -38,7 +39,7 @@ def CalculateCharacterPoolEntropy(password):
     entropy = length * math.log2(pool_size)
     return round(entropy, 2)
 
-def GetCharacterPoolSize(password):
+def GetCharacterPoolSize(password: str) -> int:
     """Determine character pool size based on character types used"""
     has_lowercase = any(c.islower() for c in password)
     has_uppercase = any(c.isupper() for c in password)
@@ -53,7 +54,7 @@ def GetCharacterPoolSize(password):
 
     return pool_size
 
-def GetEntropyCategory(entropy):
+def GetEntropyCategory(entropy: float) -> str:
     """Categorize entropy strength"""
     if entropy >= 80: return "Excellent"
     if entropy >= 60: return "Strong"

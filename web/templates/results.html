@@ -1,0 +1,38 @@
+{% extends "base.html" %}
+
+{% block title %}PassAudit - Results{% endblock %}
+
+{% block content %}
+<div class="container">
+    <h2 class="mb-4">
+        <i class="bi bi-bar-chart"></i> Analysis Results
+    </h2>
+
+    {% if not results %}
+    <div class="alert alert-info">
+        <i class="bi bi-info-circle-fill"></i>
+        No analysis results available. <a href="/analyze" class="alert-link">Analyze passwords</a> to see results here.
+    </div>
+    {% else %}
+    <div class="card mb-4">
+        <div class="card-body">
+            <h5 class="card-title">Session Results</h5>
+            <p class="card-text">
+                Total passwords analyzed: <strong>{{ results|length }}</strong>
+            </p>
+
+            {% if batch_analysis %}
+            <div class="alert alert-success">
+                <i class="bi bi-check-circle-fill"></i>
+                Batch analysis completed. Results are stored in your session.
+            </div>
+            {% endif %}
+
+            <a href="/analyze" class="btn btn-primary">
+                <i class="bi bi-plus-circle"></i> Analyze More
+            </a>
+        </div>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}

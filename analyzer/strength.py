@@ -1,6 +1,7 @@
 from analyzer.entropy import CalculateEntropy
+from typing import Dict, List, Optional, Any
 
-def CalculateStrength(password, patterns=None):
+def CalculateStrength(password: str, patterns: Optional[Dict[str, List[str]]] = None) -> float:
     """
     Calculate password strength score (0-100)
 
@@ -31,7 +32,7 @@ def CalculateStrength(password, patterns=None):
 
     return max(0, min(100, score))  # Clamp to 0-100
 
-def CalculateLengthScore(password):
+def CalculateLengthScore(password: str) -> float:
     """
     Calculate score based on password length (0-30 points)
     - < 8 chars: 0-10 points (proportional)
@@ -50,7 +51,7 @@ def CalculateLengthScore(password):
     else:
         return min(30, 25 + (length - 16) * 0.5)  # 25-30 points
 
-def CalculateCharacterDiversity(password):
+def CalculateCharacterDiversity(password: str) -> int:
     """
     Calculate score based on character type diversity (0-25 points)
     - 1 type (all lowercase): 5 points
@@ -74,7 +75,7 @@ def CalculateCharacterDiversity(password):
     else:  # type_count == 4
         return 25
 
-def CalculateEntropyScore(password):
+def CalculateEntropyScore(password: str) -> float:
     """
     Calculate score based on Shannon entropy (0-25 points)
     Normalized from entropy value
@@ -88,14 +89,16 @@ def CalculateEntropyScore(password):
 
     return round(score, 1)
 
-def CalculatePatternPenalty(patterns):
+def CalculatePatternPenalty(patterns: Dict[str, List[str]]) -> int:
     """
-    Calculate penalty based on detected patterns (up to 20 points)
+    Calculate penalty based on detected patterns (up to 30 points)
     - Sequential chars: -5 points
     - Repeated chars: -5 points
-    - Keyboard walks: -8 points
+    - Keyboard walks: -10 points (increased from -8)
     - Date patterns: -5 points
     - Common words: -3 points per word (max -9)
+    - Leetspeak: -6 points
+    - Context patterns: -4 points per pattern (max -8)
     """
     penalty = 0
 
@@ -106,7 +109,7 @@ def CalculatePatternPenalty(patterns):
         penalty += 5
 
     if patterns.get('keyboard_walks'):
-        penalty += 8
+        penalty += 10  # Increased from 8
 
     if patterns.get('dates'):
         penalty += 5
@@ -116,9 +119,18 @@ def CalculatePatternPenalty(patterns):
         word_count = min(3, len(patterns['common_words']))
         penalty += word_count * 3
 
-    return min(20, penalty)  # Cap at 20 points
+    if patterns.get('leetspeak'):
+        # Leetspeak is a weak obfuscation attempt
+        penalty += 6
 
-def GetStrengthCategory(score):
+    if patterns.get('context_patterns'):
+        # Penalize up to 2 context patterns
+        pattern_count = min(2, len(patterns['context_patterns']))
+        penalty += pattern_count * 4
+
+    return min(30, penalty)  # Cap at 30 points (increased from 20)
+
+def GetStrengthCategory(score: float) -> str:
     """Convert numerical score to category"""
     if score >= 80:
         return "Very Strong"

@@ -1,0 +1,179 @@
+{% extends "base.html" %}
+
+{% block title %}PassAudit - Analyze{% endblock %}
+
+{% block content %}
+<div class="container">
+    <h2 class="mb-4">
+        <i class="bi bi-search"></i> Password Analysis
+    </h2>
+
+    <!-- Tab Navigation -->
+    <ul class="nav nav-tabs mb-4" role="tablist">
+        <li class="nav-item" role="presentation">
+            <button class="nav-link active" id="single-tab" data-bs-toggle="tab"
+                    data-bs-target="#single" type="button" role="tab">
+                <i class="bi bi-key"></i> Single Password
+            </button>
+        </li>
+        <li class="nav-item" role="presentation">
+            <button class="nav-link" id="batch-tab" data-bs-toggle="tab"
+                    data-bs-target="#batch" type="button" role="tab">
+                <i class="bi bi-file-earmark-text"></i> Batch Analysis
+            </button>
+        </li>
+        <li class="nav-item" role="presentation">
+            <button class="nav-link" id="generate-tab" data-bs-toggle="tab"
+                    data-bs-target="#generate" type="button" role="tab">
+                <i class="bi bi-shuffle"></i> Generate Passwords
+            </button>
+        </li>
+    </ul>
+
+    <!-- Tab Content -->
+    <div class="tab-content">
+        <!-- Single Password Tab -->
+        <div class="tab-pane fade show active" id="single" role="tabpanel">
+            <div class="row justify-content-center">
+                <div class="col-lg-8">
+                    <div class="card">
+                        <div class="card-body">
+                            <h5 class="card-title mb-3">Analyze Single Password</h5>
+
+                            <div class="mb-3">
+                                <label for="single-password" class="form-label">Password:</label>
+                                <input type="password" class="form-control" id="single-password"
+                                       placeholder="Enter password" autocomplete="off">
+                            </div>
+
+                            <div class="form-check mb-3">
+                                <input class="form-check-input" type="checkbox" id="single-show">
+                                <label class="form-check-label" for="single-show">
+                                    Show password
+                                </label>
+                            </div>
+
+                            <div class="form-check mb-3">
+                                <input class="form-check-input" type="checkbox" id="single-hibp">
+                                <label class="form-check-label" for="single-hibp">
+                                    Check against Have I Been Pwned database
+                                </label>
+                                <div class="form-text">
+                                    <i class="bi bi-info-circle"></i>
+                                    This will check if the password appears in known data breaches (requires internet).
+                                </div>
+                            </div>
+
+                            <button type="button" class="btn btn-primary" id="analyze-single-btn">
+                                <i class="bi bi-search"></i> Analyze
+                            </button>
+
+                            <div id="single-result" class="mt-4" style="display: none;"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Batch Analysis Tab -->
+        <div class="tab-pane fade" id="batch" role="tabpanel">
+            <div class="row justify-content-center">
+                <div class="col-lg-8">
+                    <div class="card">
+                        <div class="card-body">
+                            <h5 class="card-title mb-3">Batch Password Analysis</h5>
+
+                            <div class="alert alert-info">
+                                <i class="bi bi-info-circle-fill"></i>
+                                <strong>Format:</strong> Upload a .txt file with one password per line (max 1000 passwords).
+                            </div>
+
+                            <div class="mb-3">
+                                <label for="batch-file" class="form-label">Select file:</label>
+                                <input type="file" class="form-control" id="batch-file" accept=".txt">
+                            </div>
+
+                            <div class="form-check mb-3">
+                                <input class="form-check-input" type="checkbox" id="batch-hibp">
+                                <label class="form-check-label" for="batch-hibp">
+                                    Check against Have I Been Pwned database
+                                </label>
+                            </div>
+
+                            <button type="button" class="btn btn-primary" id="analyze-batch-btn">
+                                <i class="bi bi-upload"></i> Upload and Analyze
+                            </button>
+
+                            <div id="batch-result" class="mt-4" style="display: none;"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Generate Passwords Tab -->
+        <div class="tab-pane fade" id="generate" role="tabpanel">
+            <div class="row justify-content-center">
+                <div class="col-lg-8">
+                    <div class="card">
+                        <div class="card-body">
+                            <h5 class="card-title mb-3">Generate Secure Passwords</h5>
+
+                            <div class="row mb-3">
+                                <div class="col-md-6">
+                                    <label for="gen-count" class="form-label">Number of passwords:</label>
+                                    <input type="number" class="form-control" id="gen-count"
+                                           value="5" min="1" max="100">
+                                </div>
+                                <div class="col-md-6">
+                                    <label for="gen-length" class="form-label">Password length:</label>
+                                    <input type="number" class="form-control" id="gen-length"
+                                           value="16" min="8" max="64">
+                                </div>
+                            </div>
+
+                            <div class="mb-3">
+                                <label class="form-label">Character types:</label>
+                                <div class="form-check">
+                                    <input class="form-check-input" type="checkbox" id="gen-uppercase" checked>
+                                    <label class="form-check-label" for="gen-uppercase">
+                                        Uppercase letters (A-Z)
+                                    </label>
+                                </div>
+                                <div class="form-check">
+                                    <input class="form-check-input" type="checkbox" id="gen-lowercase" checked>
+                                    <label class="form-check-label" for="gen-lowercase">
+                                        Lowercase letters (a-z)
+                                    </label>
+                                </div>
+                                <div class="form-check">
+                                    <input class="form-check-input" type="checkbox" id="gen-digits" checked>
+                                    <label class="form-check-label" for="gen-digits">
+                                        Digits (0-9)
+                                    </label>
+                                </div>
+                                <div class="form-check">
+                                    <input class="form-check-input" type="checkbox" id="gen-symbols" checked>
+                                    <label class="form-check-label" for="gen-symbols">
+                                        Symbols (!@#$%^&*...)
+                                    </label>
+                                </div>
+                            </div>
+
+                            <button type="button" class="btn btn-success" id="generate-btn">
+                                <i class="bi bi-shuffle"></i> Generate
+                            </button>
+
+                            <div id="generate-result" class="mt-4" style="display: none;"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_scripts %}
+<script src="{{ url_for('static', filename='js/analyze.js') }}"></script>
+{% endblock %}

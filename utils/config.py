@@ -17,7 +17,18 @@ DEFAULT_CONFIG = {
         "color_output": True
     },
     "security": {
-        "check_hibp": False
+        "check_hibp": False,
+        "hibp_timeout": 5,
+        "cache_enabled": True,
+        "cache_expiration_days": 30
+    },
+    "logging": {
+        "level": "INFO",
+        "console_output": False,
+        "file_output": True
+    },
+    "performance": {
+        "batch_processing_threads": 4
     }
 }
 
